@@ -137,9 +137,8 @@ makeTunnel() {
 	cat <<EOF > /root/$tunnelFileName.yml
 tunnel: $tunnelName
 credentials-file: /root/.cloudflared/$tunnelUUID.json
-originRequest:
-  connectTimeout: 30s
-  noTLSVerify: true
+protocol: http2
+
 ingress:
   - hostname: $tunnelDomain
     service: $tunnelProtocol://localhost:$tunnelPort
@@ -155,7 +154,7 @@ runTunnel() {
     [[ -z $(type -P screen) ]] && ${PACKAGE_UPDATE[int]} && ${PACKAGE_INSTALL[int]} screen
     read -rp "请复制粘贴配置文件的位置（例：/root/tunnel.yml）：" ymlLocation
     read -rp "请输入创建Screen会话的名字：" screenName
-    screen -USdm $screenName cloudflared tunnel --config $ymlLocation run
+    screen -USdm $screenName cloudflared tunnel --edge-ip-version 6 --config $ymlLocation run
     green "隧道已运行成功，请等待1-3分钟启动并解析完毕"
     back2menu
 }
